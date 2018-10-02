@@ -69,7 +69,7 @@ RUN echo "app.server.tomcat.dir=/liferay/bundles/tomcat\n\
 liferay.home=/liferay/bundles\n"\
 > /root/.gradle/gradle.properties
 
-ENV CATALINA_OPTS="${CATALINA_OPTS} -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap" \
+ENV CATALINA_OPTS="${CATALINA_OPTS} -server" \
 \
 GRADLE_OPTS="-server -Xmx3g -Xms3g -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap" \
 \
