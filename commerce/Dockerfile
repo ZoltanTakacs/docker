@@ -107,7 +107,7 @@ RUN echo "Value of CATALINA_OPTS: ${CATALINA_OPTS}" && \
 	cd /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test && \
 	./../../gradlew setUpTestableTomcat
 
-ENTRYPOINT ["/liferay/bundles/tomcat/bin/catalina.sh", "jpda", "start"]
+ENTRYPOINT ["/liferay/bundles/tomcat/bin/catalina.sh", "jpda", "run"]
 #WORKDIR /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test
 #CMD ./../../gradlew clean testIntegration
 
