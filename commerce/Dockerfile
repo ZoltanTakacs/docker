@@ -71,7 +71,7 @@ liferay.home=/liferay/bundles\n"\
 
 ENV CATALINA_OPTS="${CATALINA_OPTS} -server" \
 \
-GRADLE_OPTS="-server -Xmx3g -Xms3g -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap" \
+GRADLE_OPTS="-server -Xmx3g -Xms3g -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dorg.gradle.daemon=false" \
 \
 LIFERAY_HOME=/liferay/bundles \
 LIFERAY_LIFERAY_PERIOD_HOME=/liferay/bundles \
