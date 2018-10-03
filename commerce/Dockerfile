@@ -19,6 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	sudo apt-get install -y \
 	nodejs \
 	build-essential && \
+	curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && \
+	sudo apt-get install -y \
+	git-lfs && \
 	rm -rf /var/lib/apt/lists/*
 
 # # If we want to use the latest 7.1.x-private we can download it this way
