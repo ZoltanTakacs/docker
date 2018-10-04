@@ -103,9 +103,9 @@ RUN echo "Value of CATALINA_OPTS: ${CATALINA_OPTS}" && \
 	cd /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test && \
 	./../../gradlew setUpTestableTomcat && \
 	\
-	# Download test dependencies in advance
+	# Download test compile dependencies in advance
 	\
-	./../../gradlew clean testIntegration || true
+	./../../gradlew clean compileTestIntegrationJava
 
 # Remove repo as we need will need the latest state that will be come from the build context
 RUN rm -rf /liferay/com-liferay-commerce-private
