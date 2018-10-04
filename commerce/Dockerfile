@@ -106,6 +106,8 @@ RUN echo "Value of CATALINA_OPTS: ${CATALINA_OPTS}" && \
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
+FROM devxr/dxp-commerce:latest as production
+
 # Compile and deploy commerce public modules to DXP
 RUN cd /liferay && \
 	git clone https://github.com/liferay/com-liferay-commerce.git --depth 1 --single-branch --branch 7.1.x && \
