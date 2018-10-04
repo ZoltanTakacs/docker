@@ -1,11 +1,10 @@
-FROM openjdk:8u181-jdk
+FROM openjdk:8u181-jdk as builder
 
 LABEL maintainer="zoltan.takacs@liferay.com"
 
 WORKDIR /liferay
 
-ENV FILES_LIFERAY=http://files.liferay.com \
-	JPDA_ADDRESS=0.0.0.0:8000
+ENV FILES_LIFERAY=http://files.liferay.com
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	curl \
@@ -43,7 +42,11 @@ RUN cd com-liferay-commerce-private/ && \
 	cp com-liferay-commerce-private/portal/liferay-portal-tomcat-7.1.x-private.7z liferay-portal-tomcat-7.1.x-private.7z && \
 	7z x liferay-portal-tomcat-7.1.x-private.7z && \
 	rm -rf liferay-portal-tomcat-7.1.x-private.7z && \
-	mv liferay-portal-7.1.x-private bundles &&\
+	mv liferay-portal-7.1.x-private bundles && \
+	\
+	# Remove the unwanted private modules (mobile detection) -> Bug in the portal private build
+	\
+	rm -rf /liferay/bundles/osgi/portal/com.liferay.portal.mobile*.jar && \
 	# Copy the config files for Tomcat
 	cp -f com-liferay-commerce-private/config/* bundles/tomcat/bin && \
 	# Copy necessary Headless APIs to DXP
@@ -54,20 +57,6 @@ RUN cd com-liferay-commerce-private/ && \
 	git checkout COMMERCE-628 && \
 	git clean -fdx
 
-# Deploy commerce public modules to DXP
-RUN cd /liferay && \
-	git clone https://github.com/liferay/com-liferay-commerce.git --depth 1 --single-branch --branch 7.1.x && \
-	cd com-liferay-commerce && \
-	./gradlew deploy -Dbuild.profile=portal -PnodeDownload=false --parallel
-
-# Deploy commerce private modules to DXP
-RUN cd /liferay/com-liferay-commerce-private && \
-	./gradlew deploy -Dbuild.profile=portal -PnodeDownload=false --parallel && \
-	\
-	# Remove the unwanted private modules (mobile detection) -> Bug in the portal private build
-	\
-	rm -rf /liferay/bundles/osgi/portal/com.liferay.portal.mobile*.jar
-
 # Set up gradle global properties for the test framework
 RUN echo "app.server.tomcat.dir=/liferay/bundles/tomcat\n\
 liferay.home=/liferay/bundles\n"\
@@ -76,6 +65,10 @@ liferay.home=/liferay/bundles\n"\
 ENV CATALINA_OPTS="${CATALINA_OPTS} -server" \
 \
 GRADLE_OPTS="-server -Xmx3g -Xms3g -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dorg.gradle.daemon=false" \
+\
+# For debugging
+\
+JPDA_ADDRESS=0.0.0.0:8000 \
 \
 LIFERAY_HOME=/liferay/bundles \
 LIFERAY_LIFERAY_PERIOD_HOME=/liferay/bundles \
@@ -103,13 +96,27 @@ LIFERAY_MODULE_PERIOD_FRAMEWORK_PERIOD_PROPERTIES_PERIOD_LPKG_PERIOD_INDEX_PERIO
 # Expose default ports: jpda, shutdown, ajp, http, jmx, https, osgi
 EXPOSE 8000 8005 8009 8080 8099 8443 11311
 
-# Add volume for the document library
-# VOLUME [ "/liferay/bundles/data/document_library" ]
-
 # Setup integration test framework
 RUN echo "Value of CATALINA_OPTS: ${CATALINA_OPTS}" && \
 	cd /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test && \
 	./../../gradlew setUpTestableTomcat
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+
+# Compile and deploy commerce public modules to DXP
+RUN cd /liferay && \
+	git clone https://github.com/liferay/com-liferay-commerce.git --depth 1 --single-branch --branch 7.1.x && \
+	cd com-liferay-commerce && \
+	./gradlew deploy -Dbuild.profile=portal -PnodeDownload=false --parallel
+
+# Compile and deploy commerce private modules to DXP
+RUN cd /liferay/com-liferay-commerce-private && \
+	./gradlew deploy -Dbuild.profile=portal -PnodeDownload=false --parallel
+
+# Add volume for the document library
+# VOLUME [ "/liferay/bundles/data/document_library" ]
 
 WORKDIR /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test
 CMD ./../../gradlew clean testIntegration
