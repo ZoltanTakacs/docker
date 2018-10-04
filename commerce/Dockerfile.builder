@@ -51,11 +51,8 @@ RUN cd com-liferay-commerce-private/ && \
 	cp -f com-liferay-commerce-private/config/* bundles/tomcat/bin && \
 	# Copy necessary Headless APIs to DXP
 	cp com-liferay-commerce-private/modules/* bundles/osgi/modules && \
-	# Reset to the original branch
-	cd com-liferay-commerce-private && \
-	git reset --hard && \
-	git checkout COMMERCE-628 && \
-	git clean -fdx
+	# Remove repo as we need will need the latest state that will be come from the build context
+	rm -rf com-liferay-commerce-private
 
 # Set up gradle global properties for the test framework
 RUN mkdir -p /root/.gradle && \
@@ -101,27 +98,3 @@ EXPOSE 8000 8005 8009 8080 8099 8443 11311
 RUN echo "Value of CATALINA_OPTS: ${CATALINA_OPTS}" && \
 	cd /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test && \
 	./../../gradlew setUpTestableTomcat
-
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-
-FROM devxr/dxp-commerce:latest as production
-
-# Compile and deploy commerce public modules to DXP
-RUN cd /liferay && \
-	git clone https://github.com/liferay/com-liferay-commerce.git --depth 1 --single-branch --branch 7.1.x && \
-	cd com-liferay-commerce && \
-	./gradlew deploy -Dbuild.profile=portal -PnodeDownload=false --parallel
-
-# Compile and deploy commerce private modules to DXP
-RUN cd /liferay/com-liferay-commerce-private && \
-	./gradlew deploy -Dbuild.profile=portal -PnodeDownload=false --parallel
-
-# Add volume for the document library
-# VOLUME [ "/liferay/bundles/data/document_library" ]
-
-WORKDIR /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test
-CMD ./../../gradlew clean testIntegration
-
-# CMD ./liferay/bundles/tomcat/bin/catalina.sh jpda run
