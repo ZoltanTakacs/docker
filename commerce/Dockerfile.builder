@@ -36,6 +36,7 @@ COPY . com-liferay-commerce-private/
 # The 7.1.x-private bundle is committed to a preparated branch (DXP-BIN) in
 # commerce-private repo so we don't need to download it from elsewhere
 RUN cd com-liferay-commerce-private/ && \
+	git reset --hard && \
 	git checkout DXP-BIN && \
 	cd /liferay && \
 	# Move the files to the proper directory structure
@@ -51,8 +52,11 @@ RUN cd com-liferay-commerce-private/ && \
 	cp -f com-liferay-commerce-private/config/* bundles/tomcat/bin && \
 	# Copy necessary Headless APIs to DXP
 	cp com-liferay-commerce-private/modules/* bundles/osgi/modules && \
-	# Remove repo as we need will need the latest state that will be come from the build context
-	rm -rf com-liferay-commerce-private
+	# Reset to the original branch
+	cd com-liferay-commerce-private && \
+	git reset --hard && \
+	git checkout COMMERCE-628 && \
+	git clean -fdx
 
 # Set up gradle global properties for the test framework
 RUN mkdir -p /root/.gradle && \
@@ -98,3 +102,6 @@ EXPOSE 8000 8005 8009 8080 8099 8443 11311
 RUN echo "Value of CATALINA_OPTS: ${CATALINA_OPTS}" && \
 	cd /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test && \
 	./../../gradlew setUpTestableTomcat
+
+# Remove repo as we need will need the latest state that will be come from the build context
+RUN rm -rf /liferay/com-liferay-commerce-private
