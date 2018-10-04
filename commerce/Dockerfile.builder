@@ -101,7 +101,11 @@ EXPOSE 8000 8005 8009 8080 8099 8443 11311
 # Setup integration test framework
 RUN echo "Value of CATALINA_OPTS: ${CATALINA_OPTS}" && \
 	cd /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test && \
-	./../../gradlew setUpTestableTomcat
+	./../../gradlew setUpTestableTomcat && \
+	\
+	# Download test dependencies in advance
+	\
+	./../../gradlew clean testIntegration || true
 
 # Remove repo as we need will need the latest state that will be come from the build context
 RUN rm -rf /liferay/com-liferay-commerce-private
