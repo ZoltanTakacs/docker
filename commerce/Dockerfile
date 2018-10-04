@@ -58,7 +58,8 @@ RUN cd com-liferay-commerce-private/ && \
 	git clean -fdx
 
 # Set up gradle global properties for the test framework
-RUN echo "app.server.tomcat.dir=/liferay/bundles/tomcat\n\
+RUN mkdir -p /root/.gradle && \
+	echo "app.server.tomcat.dir=/liferay/bundles/tomcat\n\
 liferay.home=/liferay/bundles\n"\
 > /root/.gradle/gradle.properties
 
