@@ -11,7 +11,6 @@ COPY . com-liferay-commerce-private/
 # Checkout the branch we need to work with and compile + deploy it to the portal
 RUN cd com-liferay-commerce-private/ && \
 	git reset --hard && \
-	git checkout COMMERCE-628 && \
 	git clean -fdx && \
 	./gradlew deploy -Dbuild.profile=portal -PnodeDownload=false --parallel
 

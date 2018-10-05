@@ -36,6 +36,7 @@ COPY . com-liferay-commerce-private/
 # The 7.1.x-private bundle is committed to a preparated branch (DXP-BIN) in
 # commerce-private repo so we don't need to download it from elsewhere
 RUN cd com-liferay-commerce-private/ && \
+	export WORKING_BRANCH=`git branch | grep \* | cut -d ' ' -f2-` && \
 	git reset --hard && \
 	git checkout DXP-BIN && \
 	cd /liferay && \
@@ -55,7 +56,7 @@ RUN cd com-liferay-commerce-private/ && \
 	# Reset to the original branch
 	cd com-liferay-commerce-private && \
 	git reset --hard && \
-	git checkout COMMERCE-628 && \
+	git checkout ${WORKING_BRANCH} && \
 	git clean -fdx
 
 # Set up gradle global properties for the test framework
