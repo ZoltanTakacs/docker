@@ -14,5 +14,7 @@ RUN cd com-liferay-commerce/ && \
 	git clean -fdx && \
 	./gradlew deploy -Dbuild.profile=portal -PnodeDownload=false --parallel
 
-WORKDIR /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test
+WORKDIR /liferay/com-liferay-commerce/commerce-data-integration/commerce-data-integration-apio-end-to-end-test
 CMD ./../../gradlew clean testIntegration
+
+# CMD ./liferay/bundles/tomcat-9.0.10/bin/catalina.sh jpda run
