@@ -23,38 +23,39 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	git-lfs && \
 	rm -rf /var/lib/apt/lists/*
 
-# # If we want to use the latest 7.1.x-private we can download it this way
+# If we want to use the latest 7.1.x we can download it this way
 # RUN curl ${FILES_LIFERAY}/private/ee/portal/snapshot-7.1.x-private/latest/liferay-portal-tomcat-7.1.x-private.7z --output liferay-portal-tomcat-7.1.x-private.7z && \
+RUN curl ${FILES_LIFERAY}/private/ee/portal/snapshot-7.1.x/latest/liferay-portal-tomcat-7.1.x.7z --output liferay-portal-tomcat-7.1.x.7z && \
 
 # # Or copying it from the host with passing along with the build context
 # COPY liferay-portal-tomcat-7.1.x-private.7z .
 
-# The current Dockerfile present in the commerce-private repo which is the
+# The current Dockerfile present in the commerce repo which is the
 # current build context, copy this to the image
-COPY . com-liferay-commerce-private/
+COPY ./../ com-liferay-commerce/
 
-# The 7.1.x-private bundle is committed to a preparated branch (DXP-BIN) in
-# commerce-private repo so we don't need to download it from elsewhere
-RUN cd com-liferay-commerce-private/ && \
+# There are some necessary config files and Apio headless resource in the
+# preparated branch (DXP-BIN) in com-liferay-commerce that we need to copy to the
+# proper place in the image
+RUN cd com-liferay-commerce/ && \
 	export WORKING_BRANCH=`git branch | grep \* | cut -d ' ' -f2-` && \
 	git reset --hard && \
 	git checkout DXP-BIN && \
 	cd /liferay && \
 	# Move the files to the proper directory structure
-	cp com-liferay-commerce-private/portal/liferay-portal-tomcat-7.1.x-private.7z liferay-portal-tomcat-7.1.x-private.7z && \
-	7z x liferay-portal-tomcat-7.1.x-private.7z && \
-	rm -rf liferay-portal-tomcat-7.1.x-private.7z && \
-	mv liferay-portal-7.1.x-private bundles && \
+	7z liferay-portal-tomcat-7.1.x.7z && \
+	rm -rf liferay-portal-tomcat-7.1.x.7z && \
+	mv liferay-portal-7.1.x bundles && \
 	\
 	# Remove the unwanted private modules (mobile detection) -> Bug in the portal private build
-	\
-	rm -rf /liferay/bundles/osgi/portal/com.liferay.portal.mobile*.jar && \
+	#\
+	#rm -rf /liferay/bundles/osgi/portal/com.liferay.portal.mobile*.jar && \
 	# Copy the config files for Tomcat
-	cp -f com-liferay-commerce-private/config/* bundles/tomcat/bin && \
+	cp -f com-liferay-commerce/config/* bundles/tomcat/bin && \
 	# Copy necessary Headless APIs to DXP
-	cp com-liferay-commerce-private/modules/* bundles/osgi/modules && \
+	cp com-liferay-commerce/modules/* bundles/osgi/modules && \
 	# Reset to the original branch
-	cd com-liferay-commerce-private && \
+	cd com-liferay-commerce && \
 	git reset --hard && \
 	git checkout ${WORKING_BRANCH} && \
 	git clean -fdx
@@ -101,7 +102,7 @@ EXPOSE 8000 8005 8009 8080 8099 8443 11311
 
 # Setup integration test framework
 RUN echo "Value of CATALINA_OPTS: ${CATALINA_OPTS}" && \
-	cd /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test && \
+	cd /liferay/com-liferay-commerce/commerce-data-integration/commerce-data-integration-apio-end-to-end-test && \
 	./../../gradlew setUpTestableTomcat && \
 	\
 	# Download test compile dependencies in advance
@@ -109,4 +110,4 @@ RUN echo "Value of CATALINA_OPTS: ${CATALINA_OPTS}" && \
 	./../../gradlew clean compileTestIntegrationJava
 
 # Remove repo as we need will need the latest state that will be come from the build context
-RUN rm -rf /liferay/com-liferay-commerce-private
+RUN rm -rf /liferay/com-liferay-commerce
