@@ -13,14 +13,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	screen \
 	sudo \
 	p7zip-full && \
-	rm -rf /var/lib/apt/lists/* && \
+	#rm -rf /var/lib/apt/lists/* && \
 	curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -&& \
 	sudo apt-get install -y \
 	nodejs \
 	build-essential && \
-	curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && \
-	sudo apt-get install -y \
-	git-lfs && \
+	#curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && \
+	#sudo apt-get install -y \
+	#git-lfs && \
 	rm -rf /var/lib/apt/lists/*
 
 # If we want to use the latest 7.1.x we can download it this way
