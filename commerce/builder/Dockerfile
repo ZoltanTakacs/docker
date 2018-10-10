@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # If we want to use the latest 7.1.x we can download it this way
 # RUN curl ${FILES_LIFERAY}/private/ee/portal/snapshot-7.1.x-private/latest/liferay-portal-tomcat-7.1.x-private.7z --output liferay-portal-tomcat-7.1.x-private.7z && \
-RUN curl ${FILES_LIFERAY}/private/ee/portal/snapshot-7.1.x/latest/liferay-portal-tomcat-7.1.x.7z --output liferay-portal-tomcat-7.1.x.7z && \
+RUN curl ${FILES_LIFERAY}/private/ee/portal/snapshot-7.1.x/latest/liferay-portal-tomcat-7.1.x.7z --output liferay-portal-tomcat-7.1.x.7z
 
 # # Or copying it from the host with passing along with the build context
 # COPY liferay-portal-tomcat-7.1.x-private.7z .
