@@ -4,7 +4,9 @@ LABEL maintainer="zoltan.takacs@liferay.com"
 
 WORKDIR /liferay
 
-ENV FILES_LIFERAY=http://files.liferay.com
+ENV FILES_LIFERAY=http://files.liferay.com/private/ee \
+RELEASES_LIFERAY=https://releases.liferay.com/ \
+TOMCAT_VERISON_SUFFIX=-9.0.10
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	curl \
@@ -25,7 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # If we want to use the latest 7.1.x we can download it this way
 # RUN curl ${FILES_LIFERAY}/private/ee/portal/snapshot-7.1.x-private/latest/liferay-portal-tomcat-7.1.x-private.7z --output liferay-portal-tomcat-7.1.x-private.7z && \
-RUN curl ${FILES_LIFERAY}/private/ee/portal/snapshot-7.1.x/latest/liferay-portal-tomcat-7.1.x.7z --output liferay-portal-tomcat-7.1.x.7z
+RUN curl ${RELEASES_LIFERAY}/portal/snapshot-7.1.x/latest/liferay-portal-tomcat-7.1.x.7z --output liferay-portal-tomcat-7.1.x.7z
 
 # # Or copying it from the host with passing along with the build context
 # COPY liferay-portal-tomcat-7.1.x-private.7z .
@@ -42,7 +44,7 @@ RUN cd com-liferay-commerce/ && \
 	git checkout DXP-BIN && \
 	cd /liferay && \
 	# Move the files to the proper directory structure
-	7z liferay-portal-tomcat-7.1.x.7z && \
+	7z x liferay-portal-tomcat-7.1.x.7z && \
 	rm -rf liferay-portal-tomcat-7.1.x.7z && \
 	mv liferay-portal-7.1.x bundles && \
 	\
@@ -50,7 +52,7 @@ RUN cd com-liferay-commerce/ && \
 	#\
 	#rm -rf /liferay/bundles/osgi/portal/com.liferay.portal.mobile*.jar && \
 	# Copy the config files for Tomcat
-	cp -f com-liferay-commerce/config/* bundles/tomcat/bin && \
+	cp -f com-liferay-commerce/config/* bundles/tomcat${TOMCAT_VERISON_SUFFIX}/bin && \
 	# Copy necessary Headless APIs to DXP
 	cp com-liferay-commerce/modules/* bundles/osgi/modules && \
 	# Reset to the original branch
@@ -61,7 +63,7 @@ RUN cd com-liferay-commerce/ && \
 
 # Set up gradle global properties for the test framework
 RUN mkdir -p /root/.gradle && \
-	echo "app.server.tomcat.dir=/liferay/bundles/tomcat\n\
+	echo "app.server.tomcat.dir=/liferay/bundles/tomcat"${TOMCAT_VERISON_SUFFIX}"\n\
 liferay.home=/liferay/bundles\n"\
 > /root/.gradle/gradle.properties
 

@@ -1,29 +1,18 @@
-FROM devxr/dxp-commerce:latest
+FROM devxr/commerce:latest
 
 LABEL maintainer="zoltan.takacs@liferay.com"
 
 WORKDIR /liferay
 
-# The current Dockerfile present in the commerce-private repo which is the
+# The current Dockerfile present in the com-liferay-commerce repo which is the
 # current build context, copy this to the image
-COPY . com-liferay-commerce-private/
+COPY . com-liferay-commerce/
 
 # Checkout the branch we need to work with and compile + deploy it to the portal
-RUN cd com-liferay-commerce-private/ && \
+RUN cd com-liferay-commerce/ && \
 	git reset --hard && \
 	git clean -fdx && \
 	./gradlew deploy -Dbuild.profile=portal -PnodeDownload=false --parallel
 
-# Compile and deploy commerce public modules to DXP
-RUN cd /liferay && \
-	git clone https://github.com/liferay/com-liferay-commerce.git --depth 1 --single-branch --branch 7.1.x && \
-	cd com-liferay-commerce && \
-	./gradlew deploy -Dbuild.profile=portal -PnodeDownload=false --parallel
-
-# Add volume for the document library
-# VOLUME [ "/liferay/bundles/data/document_library" ]
-
 WORKDIR /liferay/com-liferay-commerce-private/commerce-data-integration/commerce-data-integration-apio-end-to-end-test
 CMD ./../../gradlew clean testIntegration
-
-# CMD ./liferay/bundles/tomcat/bin/catalina.sh jpda run
