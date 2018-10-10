@@ -30,9 +30,8 @@ RUN curl ${FILES_LIFERAY}/private/ee/portal/snapshot-7.1.x/latest/liferay-portal
 # # Or copying it from the host with passing along with the build context
 # COPY liferay-portal-tomcat-7.1.x-private.7z .
 
-# The current Dockerfile present in the commerce repo which is the
-# current build context, copy this to the image
-COPY ./../ com-liferay-commerce/
+# Copy the whole com-liferay-commerce repository
+COPY . com-liferay-commerce/
 
 # There are some necessary config files and Apio headless resource in the
 # preparated branch (DXP-BIN) in com-liferay-commerce that we need to copy to the
