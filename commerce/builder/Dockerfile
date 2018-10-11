@@ -6,7 +6,10 @@ WORKDIR /liferay
 
 ENV FILES_LIFERAY=http://files.liferay.com/private/ee \
 RELEASES_LIFERAY=https://releases.liferay.com/ \
-TOMCAT_VERISON_SUFFIX=-9.0.10
+TOMCAT_VERISON_SUFFIX=-9.0.10 \
+\
+LIFERAY_HOME=/liferay/bundles \
+LIFERAY_LIFERAY_PERIOD_HOME=/liferay/bundles
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	curl \
@@ -33,7 +36,7 @@ RUN curl ${RELEASES_LIFERAY}/portal/snapshot-7.1.x/latest/liferay-portal-tomcat-
 # COPY liferay-portal-tomcat-7.1.x-private.7z .
 
 # Copy the whole com-liferay-commerce repository
-COPY . com-liferay-commerce/
+COPY --chown=root:root . com-liferay-commerce/
 
 # There are some necessary config files and Apio headless resource in the
 # preparated branch (DXP-BIN) in com-liferay-commerce that we need to copy to the
@@ -47,6 +50,8 @@ RUN cd com-liferay-commerce/ && \
 	7z x liferay-portal-tomcat-7.1.x.7z && \
 	rm -rf liferay-portal-tomcat-7.1.x.7z && \
 	mv liferay-portal-7.1.x bundles && \
+	chown -R root:root ${LIFERAY_HOME} && \
+	chmod +x ${LIFERAY_HOME}/tomcat${TOMCAT_VERISON_SUFFIX}/bin/catalina.sh && \
 	\
 	# Remove the unwanted private modules (mobile detection) -> Bug in the portal private build
 	#\
@@ -74,9 +79,6 @@ GRADLE_OPTS="-server -Xmx3g -Xms3g -server -XX:+UnlockExperimentalVMOptions -XX:
 # For debugging
 \
 JPDA_ADDRESS=0.0.0.0:8000 \
-\
-LIFERAY_HOME=/liferay/bundles \
-LIFERAY_LIFERAY_PERIOD_HOME=/liferay/bundles \
 \
 # Default values
 \

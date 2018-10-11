@@ -6,7 +6,7 @@ WORKDIR /liferay
 
 # The current Dockerfile present in the com-liferay-commerce repo which is the
 # current build context, copy this to the image
-COPY . com-liferay-commerce/
+COPY --chown=root:root . com-liferay-commerce/
 
 # Checkout the branch we need to work with and compile + deploy it to the portal
 RUN cd com-liferay-commerce/ && \
@@ -17,4 +17,4 @@ RUN cd com-liferay-commerce/ && \
 WORKDIR /liferay/com-liferay-commerce/commerce-data-integration/commerce-data-integration-apio-end-to-end-test
 CMD ./../../gradlew clean testIntegration
 
-# CMD ./liferay/bundles/tomcat-9.0.10/bin/catalina.sh jpda run
+# CMD bash /liferay/bundles/tomcat-9.0.10/bin/catalina.sh jpda run
